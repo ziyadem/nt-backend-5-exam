@@ -1,0 +1,72 @@
+datasource db {
+    url = env("DATABASE_URL")
+    provider = "postgresql"
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Category {
+    id           String    @map("id")            @db.Uuid         @default(uuid())
+    title        String    @map("title")         @db.VarChar(200)
+    createdAt    DateTime  @map("created_at")    @db.Timestamp(0) @default(now())
+    updatedAt    DateTime  @map("updated_at")    @db.Timestamp(0) @updatedAt
+    deletedAt    DateTime? @map("deleted_at")
+
+    subcategory  Supcategory[]
+
+    @@id([ id ])
+    @@unique([title])
+    @@map("categorys")
+}
+
+model Supcategory {
+    id           String    @map("id")            @db.Uuid         @default(uuid())
+    title        String    @map("title")         @db.VarChar(200)
+    category_id  String    @map("category_id")   @db.Uuid
+    createdAt    DateTime  @map("created_at")    @db.Timestamp(0) @default(now())
+    updatedAt    DateTime  @map("updated_at")    @db.Timestamp(0) @updatedAt
+    deletedAt    DateTime? @map("deleted_at")
+
+    product Product[]
+    category Category @relation(fields: [category_id], references: [id],onDelete: Cascade,onUpdate: NoAction)
+
+    @@id([ id ])
+    @@unique([title])
+    @@map("supcategorys")
+}
+
+model Product {
+    id                 String    @map("id")             @db.Uuid         @default(uuid())
+    title              String    @map("title")          @db.VarChar(200)
+    price              Int       @map("price")          @db.Integer()
+    description        String    @map("description")    @db.VarChar()
+    status             String    @map("status")         @db.VarChar()   @default("sale")
+    supcategory_id     String    @map("supcategory_id") @db.Uuid
+    createdAt          DateTime  @map("created_at")     @db.Timestamp(0) @default(now())
+    updatedAt          DateTime  @map("updated_at")     @db.Timestamp(0) @updatedAt
+    deletedAt          DateTime? @map("deleted_at")
+
+    order Order[]
+    supcategory Supcategory @relation(fields: [supcategory_id], references: [id],onDelete: Cascade,onUpdate: NoAction)
+
+
+    @@id([ id ])
+    @@unique([title])
+    @@map("products")
+}
+
+model Order {
+    id           String    @map("id")            @db.Uuid         @default(uuid())
+    user_id      String    @map("user_id")       @db.Uuid
+    product_id   String    @map("product_id")    @db.Uuid
+    createdAt    DateTime  @map("created_at")    @db.Timestamp(0) @default(now())
+    deletedAt    DateTime? @map("deleted_at")
+
+    product Product @relation(fields: [product_id], references: [id],onDelete: Cascade,onUpdate: NoAction)
+
+    @@id([ id ])
+    @@unique([user_id,product_id])
+    @@map("orders")
+}

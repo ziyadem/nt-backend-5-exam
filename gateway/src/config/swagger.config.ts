@@ -1,0 +1,27 @@
+import type { OpenAPIObject } from '@nestjs/swagger'
+
+export declare interface SwaggerOptions {
+  path?: string
+  options?: Omit<OpenAPIObject, 'paths'>
+}
+
+export const swaggerConfig: SwaggerOptions = {
+  path: process.env.SWAGGER_PATH ?? '/docs',
+  options: {
+    openapi: '3.0.0',
+    info: {
+      version: '1.0.0',
+      description: 'Main Gateway',
+      title: 'Gateway',
+    },
+    components: {
+      securitySchemes: {
+        token: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+  },
+}
